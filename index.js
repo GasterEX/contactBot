@@ -67,7 +67,9 @@ async function sendCheckMessage(message) {
   let contactCategory = message.guild.channels.cache.find(channel => channel.name == `お問い合わせ`);
   //送信されたメッセージがお問い合わせのカテゴリー内だった場合
   if (message.channel.parentId == contactCategory && !message.author.bot) {
+    //管理者のロールを取得
     let operationRole = message.guild.roles.cache.find(role => role.name == `admin`);
+    //メッセージを送信
     await message.channel.send({
       content: `メッセージを受け取りました。運営の対応をお待ちください。${operationRole}`
     })
