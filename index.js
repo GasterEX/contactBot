@@ -26,6 +26,7 @@ client.on('interactionCreate', async(interaction) => {
 });
 
 async function sendForm(message) {
+  //メッセージが!setupだったら
   if (message.content.startsWith("!setup")) {
     //ボタン設置
     sendButton(message, "お問い合わせ", "相談窓口");
@@ -74,15 +75,11 @@ async function sendCheckMessage(message) {
 }
 async function createPrivateChannel(interaction) {
   //インタラクションがお問い合わせのボタンだったら
-  let guild = interaction.guild;
-  let targetPlayer = interaction.user;
   if (interaction.customId === "contact") {
-    //全員のロールを取得
-    const everyoneRole = guild.roles.everyone;
     //お問い合わせのカテゴリーを取得
-    let contactCategory = guild.channels.cache.find(channel => channel.name == `お問い合わせ`);
+    let contactCategory = interaction.guild.channels.cache.find(channel => channel.name == `お問い合わせ`);
     //プライベートチャンネル作成
-    let targetChannel = await guild.channels.create({
+    let targetChannel = await interaction.guild.channels.create({
       name: '相談窓口',
       type: Discord.ChannelType.GuildText,
       parent: contactCategory.id,
@@ -90,15 +87,15 @@ async function createPrivateChannel(interaction) {
         id: client.user.id,
         allow: [Discord.PermissionFlagsBits.ViewChannel],
       }, {
-        id: targetPlayer.id,
+        id: interaction.user.id,
         allow: [Discord.PermissionFlagsBits.ViewChannel]
       }, {
-        id: everyoneRole.id,
+        id: interaction.guild.roles.everyone.id,
         deny: [Discord.PermissionFlagsBits.ViewChannel]
       }],
     }).catch(console.error);
     //メッセージを送信
-    client.channels.cache.get(targetChannel.id).send(`${targetPlayer}さんの窓口を開設しました。ご用件をお伺いいたします\n**終了する際には!finコマンドを実行してください**`);
+    client.channels.cache.get(targetChannel.id).send(`${interaction.user}さんの窓口を開設しました。ご用件をお伺いいたします\n**終了する際には!finコマンドを実行してください**`);
   }
 }
 client.login(DISCORD_BOT_TOKEN);
